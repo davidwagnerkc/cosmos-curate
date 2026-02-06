@@ -1,4 +1,4 @@
-TAG=1.0.0
+TAG=2
 REPO_ROOT=$HOME/git/cosmos-curate
 docker build \
   --ulimit nofile=65536 \

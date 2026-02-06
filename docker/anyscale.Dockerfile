@@ -2,7 +2,8 @@
 # Anyscale-compatible image built on top of the Cosmos Curate image.
 # Build with: docker build --platform linux/amd64 -f docker/anyscale.Dockerfile -t cosmos-curate:anyscale .
 
-FROM cosmos-curate:1.0.0
+ARG COSMOS_TAG=2
+FROM cosmos-curate:${COSMOS_TAG}
 
 SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
@@ -21,6 +22,7 @@ RUN set -euxo pipefail \
         git \
         gdb \
         curl \
+        vim \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /var/run/sshd
@@ -55,6 +57,7 @@ RUN set -euxo pipefail \
 
 RUN mkdir -p /cosmos_curate/config /config \
     && chown -R ray /cosmos_curate /config
+ENV COSMOS_S3_PROFILE_PATH=/mnt/user_storage/s3_creds_file
 ENV PATH=/opt/cosmos-curate/.pixi/envs/default/bin:$PATH
 ENV HOME=/home/ray
 WORKDIR /home/ray
@@ -64,7 +67,7 @@ RUN sudo mkdir -p /anyscale/init
 RUN sudo chown -R ray /anyscale/init
 RUN <<'EOF'
 sudo cat >/anyscale/init/init.sh <<'EOC'
-cp /mnt/user_storage/cosmos-config.yaml /cosmos_curate/config/cosmos_curate.yaml
+ls -halrt /mnt/user_storage/ > /tmp/init_ls.log 2>&1 || true
 EOC
 EOF
 
